@@ -15,7 +15,7 @@ typedef struct Alunos{
 
 int main(){
 
-    void menuPrincipal();
+    int menuPrincipal();
     void menuAluno();
 
     Aluno listaAlunos[MAX_ALUNOS];
@@ -28,8 +28,8 @@ int main(){
     
     
     while(!sair){
-        menuPrincipal();
-        scanf("%d", &opcao);
+        
+        opcao = menuPrincipal();
         voltar = false;
 
         switch(opcao){
@@ -97,12 +97,14 @@ int main(){
     return 0;
 }
 
-void menuPrincipal(){
+int menuPrincipal(){
+    int opcao;
     printf("----Projeto Escola----\n");
     printf("0 - Sair\n");
     printf("1 - Aluno\n");
     printf("2 - Professor\n");
     printf("3 - Disciplina\n");
+    scanf("%d", &opcao);
 }
 
 void menuAluno(){
