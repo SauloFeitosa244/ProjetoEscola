@@ -10,7 +10,7 @@
 - [ ] Listar Disciplinas (Dados das disciplinas SEM os alunos)
 - [ ] Listar Alunos por sexo (Masculino/Femininno)
 - [ ] Listar Alunos ordenados por nome
-- [ ] Listar Alunos ordenados por data de nascimento
+- [ x ] Listar Alunos ordenados por data de nascimento
 - [ ] Listar Professores por sexo (Masculino/Femininno)
 - [ ] Listar Professores ordenados por nome
 - [ ] Listar Professres ordenados por data de nascimento

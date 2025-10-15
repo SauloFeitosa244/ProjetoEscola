@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#define MAX_ALUNOS 2
+#define MAX_ALUNOS 5
 
 typedef struct Alunos{
     int matricula;
@@ -16,9 +16,11 @@ typedef struct Alunos{
 int excluirAluno(int qtdAlunos, Aluno listaAlunos[MAX_ALUNOS]);
 int atualizarAluno(int qtdAlunos, Aluno listaAlunos[MAX_ALUNOS]);
 int listarAlunos(int qtdAlunos, Aluno listaAlunos[MAX_ALUNOS]);
+int listarAlunosPorDataNascimento(int qtdAlunos, Aluno listaAlunos[MAX_ALUNOS]);
 int cadastrarAluno(int qtdAlunos,Aluno listaAlunos[MAX_ALUNOS]);
 int menuPrincipal();
 int menuAluno();
+
 
 int main(){
     
@@ -59,9 +61,12 @@ int main(){
                         listarAlunos(qtdAlunos, listaAlunos);
                         break;
                     case 3:
-                        atualizarAluno(qtdAlunos, listaAlunos);
+                        listarAlunosPorDataNascimento(qtdAlunos, listaAlunos);
                         break;
                     case 4:
+                        atualizarAluno(qtdAlunos, listaAlunos);
+                        break;
+                    case 5:
                         qtdAlunos = excluirAluno(qtdAlunos, listaAlunos);
                         break;
                     default:
@@ -103,8 +108,9 @@ int menuAluno(){
     printf("0 - Voltar\n");
     printf("1 - Cadastrar Aluno\n");
     printf("2 - Listar Alunos\n");
-    printf("3 - Atualizar Aluno\n");
-    printf("4 - Remover Aluno\n");
+    printf("3 - Listar por Data de Nascimento\n");
+    printf("4 - Atualizar Aluno\n");
+    printf("5 - Remover Aluno\n");
     scanf("%d", &opcaoAluno);
     return opcaoAluno;
 }
@@ -158,7 +164,7 @@ int listarAlunos(int qtdAlunos, Aluno listaAlunos[MAX_ALUNOS]){
         printf("\n----Aluno %d----\n", i+1);
         printf("Nome: %s", listaAlunos[i].nome);
         printf("Matrícula: %d\n", listaAlunos[i].matricula);
-        printf("Data de nascimento: %d/%d/%d\n", listaAlunos[i].dia, listaAlunos[i].mes, listaAlunos[i].ano);
+        printf("Data de nascimento: %02d/%02d/%d\n", listaAlunos[i].dia, listaAlunos[i].mes, listaAlunos[i].ano);
         if(listaAlunos[i].sexo == 1)
             printf("Sexo: Masculino\n");
         else if(listaAlunos[i].sexo == 2)
@@ -245,4 +251,51 @@ int excluirAluno(int qtdAlunos, Aluno listaAlunos[MAX_ALUNOS]) {
     }
 
     return qtdAlunos;
+}
+
+
+int compararDatas(int dia1, int mes1, int ano1, int dia2, int mes2, int ano2) {
+    if (ano1 != ano2) return ano1 - ano2;
+    if (mes1 != mes2) return mes1 - mes2;
+    return dia1 - dia2;
+}
+
+
+int listarAlunosPorDataNascimento(int qtdAlunos, Aluno listaAlunos[MAX_ALUNOS]) {
+    if (qtdAlunos < 1) {
+        printf("\nNenhum aluno cadastrado\n\n");
+        return 0;
+    }
+    
+    Aluno listaOrdenada[MAX_ALUNOS];
+    for (int i = 0; i < qtdAlunos; i++) {
+        listaOrdenada[i] = listaAlunos[i];
+    }
+    
+    for (int i = 1; i < qtdAlunos; i++) {
+        Aluno alunoAtual = listaOrdenada[i];
+        int j = i - 1;
+        
+        
+        while (j >= 0 && compararDatas(alunoAtual.dia, alunoAtual.mes, alunoAtual.ano, 
+                                      listaOrdenada[j].dia, listaOrdenada[j].mes, listaOrdenada[j].ano) < 0) {
+            listaOrdenada[j + 1] = listaOrdenada[j];
+            j--;
+        }
+        listaOrdenada[j + 1] = alunoAtual;
+    }
+    
+    printf("Lista de Alunos por Data de Nascimento:\n");
+    for (int i = 0; i < qtdAlunos; i++) {
+        printf("\n----Aluno %d----\n", i + 1);
+        printf("Nome: %s", listaOrdenada[i].nome);
+        printf("Matrícula: %d\n", listaOrdenada[i].matricula);
+        printf("Data de nascimento: %02d/%02d/%d\n", listaOrdenada[i].dia, listaOrdenada[i].mes, listaOrdenada[i].ano);
+        if (listaOrdenada[i].sexo == 1)
+            printf("Sexo: Masculino\n");
+        else if (listaOrdenada[i].sexo == 2)
+            printf("Sexo: Feminino\n");
+    }
+    
+    return 1;
 }
