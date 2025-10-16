@@ -6,8 +6,8 @@
 #include <stdlib.h> 
 
 #define ano_atual 2025
-#define MAX_PROFESSORES 5
-#define MAX_ALUNOS 5
+#define MAX_PROFESSORES 2
+#define MAX_ALUNOS 2
 #define valido -1
 
 // ==================== ESTRUTURAS ====================
@@ -32,6 +32,9 @@ typedef struct Alunos{
 } Aluno;
 
 // ==================== PROTÓTIPOS - PROFESSORES ====================
+int listarProfessoresPorIdade(int qtdProfessores, Professor listaProfessores[MAX_PROFESSORES]);
+void mergeSortProfessorIdade(Professor arr[], int left, int right);
+void mergeProfessorIdade(Professor arr[], int left, int mid, int right);
 int listarProfessoresAlfabetica(int qtdProfessores, Professor listaProfessores[MAX_PROFESSORES]);
 int menuListaProfessor();
 int excluirProfessor(int qtdProfessores, Professor listaProfessores[MAX_PROFESSORES]);
@@ -172,6 +175,9 @@ int main(){
                                     case 5:
                                         listarProfessoresSexo(qtdProfessores, listaProfessores);
                                         break;
+                                    case 6:  // NOVO CASE
+                                        listarProfessoresPorIdade(qtdProfessores, listaProfessores);
+                                        break;
                                     default:
                                         printf("\nOpção inválida\n\n");
                                         break;
@@ -296,6 +302,8 @@ void mergeSortAluno(Aluno arr[], int left, int right) {
         mergeAluno(arr, left, mid, right);
     }
 }
+
+
 
 int listarAlunosAlfabetica(int qtdAlunos, Aluno listaAlunos[MAX_ALUNOS]) {
     if (qtdAlunos < 1) {
@@ -1278,6 +1286,117 @@ int excluirProfessor(int qtdProfessores, Professor listaProfessores[MAX_PROFESSO
     return qtdProfessores;
 }
 
+// ==================== FUNÇÕES DE ORDENAÇÃO POR IDADE - PROFESSORES ====================
+
+void mergeProfessorIdade(Professor arr[], int left, int mid, int right) {
+    int i, j, k;
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+    
+    Professor *leftArr = (Professor*)malloc(n1 * sizeof(Professor));
+    Professor *rightArr = (Professor*)malloc(n2 * sizeof(Professor));
+    
+    for (i = 0; i < n1; i++)
+        leftArr[i] = arr[left + i];
+    for (j = 0; j < n2; j++)
+        rightArr[j] = arr[mid + 1 + j];
+    
+    i = 0;
+    j = 0;
+    k = left;
+    
+    while (i < n1 && j < n2) {
+        if (leftArr[i].ano < rightArr[j].ano) {
+            arr[k] = leftArr[i];
+            i++;
+        } else if (leftArr[i].ano > rightArr[j].ano) {
+            arr[k] = rightArr[j];
+            j++;
+        } else {
+            if (leftArr[i].mes < rightArr[j].mes) {
+                arr[k] = leftArr[i];
+                i++;
+            } else if (leftArr[i].mes > rightArr[j].mes) {
+                arr[k] = rightArr[j];
+                j++;
+            } else {
+                if (leftArr[i].dia <= rightArr[j].dia) {
+                    arr[k] = leftArr[i];
+                    i++;
+                } else {
+                    arr[k] = rightArr[j];
+                    j++;
+                }
+            }
+        }
+        k++;
+    }
+    
+    while (i < n1) {
+        arr[k] = leftArr[i];
+        i++;
+        k++;
+    }
+    
+    while (j < n2) {
+        arr[k] = rightArr[j];
+        j++;
+        k++;
+    }
+    
+    free(leftArr);
+    free(rightArr);
+}
+
+void mergeSortProfessorIdade(Professor arr[], int left, int right) {
+    if (left < right) {
+        int mid = left + (right - left) / 2;
+        
+        mergeSortProfessorIdade(arr, left, mid);
+        mergeSortProfessorIdade(arr, mid + 1, right);
+        mergeProfessorIdade(arr, left, mid, right);
+    }
+}
+
+int listarProfessoresPorIdade(int qtdProfessores, Professor listaProfessores[MAX_PROFESSORES]) {
+    if (qtdProfessores < 1) {
+        printf("\nNenhum professor cadastrado\n\n");
+        return 0;
+    }
+
+    Professor listaOrdenada[MAX_PROFESSORES];
+    for (int i = 0; i < qtdProfessores; i++) {
+        listaOrdenada[i] = listaProfessores[i];
+    }
+    
+    mergeSortProfessorIdade(listaOrdenada, 0, qtdProfessores - 1);
+    
+    printf("\n=== PROFESSORES ORDENADOS POR IDADE (DO MAIS VELHO AO MAIS NOVO) ===\n");
+    for (int i = 0; i < qtdProfessores; i++) {
+        printf("\n----Professor %d----\n", i + 1);
+        printf("Nome: %s\n", listaOrdenada[i].nome);
+        printf("Matrícula: %d\n", listaOrdenada[i].matricula);
+        printf("CPF: %s\n", listaOrdenada[i].cpf);
+        printf("Data de nascimento: %d/%d/%d\n", listaOrdenada[i].dia, listaOrdenada[i].mes, listaOrdenada[i].ano);
+        
+
+        int idade = ano_atual - listaOrdenada[i].ano;
+
+        if (listaOrdenada[i].mes > 10 || (listaOrdenada[i].mes == 10 && listaOrdenada[i].dia > 17)) {
+            idade--;
+        }
+        printf("Idade: %d anos\n", idade);
+        
+        if (listaOrdenada[i].sexo == 1)
+            printf("Sexo: Masculino\n");
+        else if (listaOrdenada[i].sexo == 2)
+            printf("Sexo: Feminino\n");
+    }
+    printf("\n");
+    
+    return 0;
+}
+
 int menuListaProfessor(){
     int opcaoProfessor;
     printf("\n====MENU LISTAGEM PROFESSORES====\n");
@@ -1287,6 +1406,7 @@ int menuListaProfessor(){
     printf("3 - Listar aniversariantes\n");
     printf("4 - Listar por busca\n");
     printf("5 - Listar Professores por sexo\n");
+    printf("6 - Listar Professores por idade\n"); // NOVA OPÇÃO
    
     scanf("%d", &opcaoProfessor);
     return opcaoProfessor;
